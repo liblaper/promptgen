@@ -1,1 +1,1 @@
-# promptgen
+# promptgen.github.io

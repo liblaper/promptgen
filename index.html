@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0c1716">
+  <title data-i18n="app.pageTitle">Prompt Gen · ESP32 y Arduino</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="#top" data-i18n-aria-label="app.brandAria" aria-label="Prompt Gen">
+        <span class="brand-mark" aria-hidden="true"><span></span><span></span><span></span></span>
+        <span>
+          <strong data-i18n="app.name">Prompt Gen</strong>
+          <small data-i18n="app.brandTagline">Prompts para hardware maker</small>
+        </span>
+      </a>
+      <div class="topbar-note"><span class="status-dot" aria-hidden="true"></span><span data-i18n="app.ready">Listo para diseñar</span></div>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <div class="hero-copy">
+          <p class="eyebrow" data-i18n="hero.eyebrow">DE LA IDEA AL CIRCUITO</p>
+          <h1 data-i18n="hero.title">Convierte tu idea en un prompt que Schematik entienda.</h1>
+          <p class="hero-lead" data-i18n="hero.subtitle">Define tu proyecto con claridad y recibe una especificación lista para pegar en schematik.io, con componentes, conexiones, firmware y pruebas.</p>
+          <div class="hero-pills" aria-label="Características">
+            <span data-i18n="hero.pill1">ESP32 · Arduino</span>
+            <span data-i18n="hero.pill2">Cableado verificable</span>
+            <span data-i18n="hero.pill3">Firmware explicado</span>
+          </div>
+        </div>
+        <div class="hero-orbit" aria-hidden="true">
+          <div class="orbit-ring ring-one"></div>
+          <div class="orbit-ring ring-two"></div>
+          <div class="chip-illustration"><span>IO</span><i></i><i></i><i></i><i></i></div>
+        </div>
+      </section>
+
+      <div id="appNotice" class="notice" role="status" aria-live="polite" hidden></div>
+
+      <section class="workspace" aria-label="Generador de prompts">
+        <form id="promptForm" class="panel form-panel">
+          <div class="panel-heading">
+            <div>
+              <p class="section-kicker" data-i18n="form.kicker">01 · DEFINE</p>
+              <h2 data-i18n="form.title">Cuéntame qué quieres construir</h2>
+            </div>
+            <span class="step-badge" data-i18n="form.badge">5 min</span>
+          </div>
+
+          <div class="template-strip">
+            <span data-i18n="form.templatesLabel">Empieza con una plantilla:</span>
+            <div class="template-buttons">
+              <button type="button" class="template-button" data-template="clima" data-i18n="templates.weather">Estación climática</button>
+              <button type="button" class="template-button" data-template="riego" data-i18n="templates.watering">Riego automático</button>
+              <button type="button" class="template-button" data-template="alarma" data-i18n="templates.alarm">Alarma IoT</button>
+            </div>
+          </div>
+
+          <div class="field-grid">
+            <label class="field field-wide">
+              <span data-i18n="form.projectLabel">Nombre del proyecto</span>
+              <input id="projectName" name="projectName" type="text" maxlength="80" required data-i18n-placeholder="form.projectPlaceholder" placeholder="Ej. Huerto inteligente de balcón">
+            </label>
+            <label class="field">
+              <span data-i18n="form.boardLabel">Placa principal</span>
+              <select id="board" name="board">
+                <option value="ESP32 DevKit v1">ESP32 DevKit v1</option>
+                <option value="ESP32-WROOM-32">ESP32-WROOM-32</option>
+                <option value="ESP32-C3 SuperMini">ESP32-C3 SuperMini</option>
+                <option value="ESP32-S3">ESP32-S3</option>
+                <option value="Wemos D1 mini">Wemos D1 mini</option>
+                <option value="Raspberry Pi Pico 2 W">Raspberry Pi Pico 2 W</option>
+                <option value="Arduino Uno R3">Arduino Uno R3</option>
+                <option value="Arduino Nano">Arduino Nano</option>
+                <option value="Arduino Mega 2560">Arduino Mega 2560</option>
+                <option value="Otra placa compatible">Otra placa compatible</option>
+              </select>
+            </label>
+            <label class="field">
+              <span data-i18n="form.experienceLabel">Mi experiencia</span>
+              <select id="experience" name="experience">
+                <option value="principiante" data-i18n="form.experienceBeginner">Principiante</option>
+                <option value="intermedio" data-i18n="form.experienceIntermediate">Intermedio</option>
+                <option value="avanzado" data-i18n="form.experienceAdvanced">Avanzado</option>
+              </select>
+            </label>
+            <label class="field field-wide">
+              <span data-i18n="form.goalLabel">¿Qué debe hacer?</span>
+              <textarea id="goal" name="goal" rows="3" maxlength="900" required data-i18n-placeholder="form.goalPlaceholder" placeholder="Describe el resultado final, cuándo se activa y qué debería ver o recibir el usuario."></textarea>
+            </label>
+            <label class="field field-wide">
+              <span><span data-i18n="form.componentsLabel">Componentes que ya tienes</span> <em data-i18n="form.optional">(opcional)</em></span>
+              <textarea id="components" name="components" rows="2" maxlength="700" data-i18n-placeholder="form.componentsPlaceholder" placeholder="Ej. DHT22, relé de 5 V, bomba, pantalla OLED 0.96, fuente 12 V"></textarea>
+            </label>
+            <label class="field">
+              <span data-i18n="form.connectivityLabel">Conectividad</span>
+              <select id="connectivity" name="connectivity">
+                <option value="sin conexión" data-i18n="form.connectivityNone">Sin conexión / local</option>
+                <option value="Wi-Fi" data-i18n="form.connectivityWifi">Wi-Fi</option>
+                <option value="Bluetooth Low Energy (BLE)" data-i18n="form.connectivityBle">Bluetooth Low Energy (BLE)</option>
+                <option value="Wi-Fi y MQTT" data-i18n="form.connectivityMqtt">Wi-Fi y MQTT</option>
+                <option value="Wi-Fi y HTTP/REST" data-i18n="form.connectivityHttp">Wi-Fi y HTTP/REST</option>
+              </select>
+            </label>
+            <label class="field">
+              <span data-i18n="form.powerLabel">Alimentación disponible</span>
+              <select id="power" name="power">
+                <option value="USB 5 V" data-i18n="form.powerUsb">USB 5 V</option>
+                <option value="5 V regulados" data-i18n="form.power5">5 V regulados</option>
+                <option value="Batería" data-i18n="form.powerBattery">Batería</option>
+                <option value="12 V + convertidor step-down" data-i18n="form.power12">12 V + convertidor step-down</option>
+                <option value="Aún no lo sé" data-i18n="form.powerUnknown">Aún no lo sé</option>
+              </select>
+            </label>
+            <label class="field field-wide">
+              <span><span data-i18n="form.constraintsLabel">Detalles, límites o preferencias</span> <em data-i18n="form.optional">(opcional)</em></span>
+              <textarea id="constraints" name="constraints" rows="2" maxlength="700" data-i18n-placeholder="form.constraintsPlaceholder" placeholder="Ej. No usar pines de arranque, incluir protección para la bomba, explicar cada paso."></textarea>
+            </label>
+          </div>
+
+          <div class="form-footer">
+            <p class="helper-text"><span class="helper-icon" aria-hidden="true">i</span><span data-i18n="form.helper">Cuanto más concreto seas, más útil será el circuito generado.</span></p>
+            <button class="primary-button" type="submit"><span data-i18n="form.generate">Generar prompt</span><span class="button-arrow" aria-hidden="true">↗</span></button>
+          </div>
+        </form>
+
+        <section class="panel output-panel" aria-labelledby="outputTitle">
+          <div class="panel-heading output-heading">
+            <div>
+              <p class="section-kicker" data-i18n="output.kicker">02 · LISTO PARA PEGAR</p>
+              <h2 id="outputTitle" data-i18n="output.title">Tu prompt optimizado</h2>
+            </div>
+            <span id="outputState" class="output-state" data-i18n="output.emptyState">En espera</span>
+          </div>
+          <div id="emptyOutput" class="empty-output">
+            <div class="empty-icon" aria-hidden="true">✦</div>
+            <h3 data-i18n="output.emptyTitle">Tu siguiente proyecto empieza aquí</h3>
+            <p data-i18n="output.emptyText">Completa el formulario y crearemos un prompt con instrucciones claras para el esquema, el código y la validación.</p>
+          </div>
+          <div id="generatedOutput" class="generated-output" hidden>
+            <div class="output-toolbar">
+              <span id="promptWordCount" class="word-count"></span>
+              <button id="copyButton" class="secondary-button" type="button"><span aria-hidden="true">▣</span><span data-i18n="output.copy">Copiar prompt</span></button>
+            </div>
+            <pre id="promptResult" tabindex="0"></pre>
+            <div class="output-actions">
+              <button id="saveButton" class="save-button" type="button"><span aria-hidden="true">＋</span><span data-i18n="output.save">Guardar proyecto</span></button>
+              <button id="downloadButton" class="text-button" type="button" data-i18n="output.download">Descargar .txt</button>
+            </div>
+          </div>
+        </section>
+      </section>
+
+      <section class="saved-section" aria-labelledby="savedTitle">
+        <div class="section-heading-row">
+          <div>
+            <p class="section-kicker" data-i18n="saved.kicker">TU TALLER</p>
+            <h2 id="savedTitle" data-i18n="saved.title">Proyectos guardados</h2>
+          </div>
+          <span id="savedCount" class="count-badge">0</span>
+        </div>
+        <div id="savedEmpty" class="saved-empty">
+          <p data-i18n="saved.empty">Aún no has guardado proyectos. Tu biblioteca aparecerá aquí.</p>
+        </div>
+        <div id="savedList" class="saved-list" hidden></div>
+      </section>
+    </main>
+
+    <footer class="footer"><span data-i18n="footer.tip">Diseña con intención · conecta con seguridad · prueba antes de alimentar.</span><span>Prompt Gen v1</span></footer>
+  </div>
+  <script src="main.js"></script>
+</body>
+</html>
